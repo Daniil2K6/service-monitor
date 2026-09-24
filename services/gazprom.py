@@ -1,3 +1,0 @@
-name = "Gazprom"
-url = "https://www.gazprom.ru"
-description = "сервис газ пром, почемуто у меня выдаёт отказы"

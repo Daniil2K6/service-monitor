@@ -1,3 +1,0 @@
-name = "Fortnite"
-url = "https://www.epicgames.com/fortnite"
-description = "Игровая платформа Epic Games"

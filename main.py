@@ -1,212 +1,126 @@
-import urllib.request
-import urllib.error
-import os
-import importlib
-import sys
+"""Точка запуска ServiceMonitor: меню и вывод данных."""
+
+from checker import (
+    check_service_status,
+    search_services,
+    sort_services,
+)
+from storage import delete_service, load_services, save_service
+from utils import input_int, input_str
 
 
-def ping_service(url):
-    """Проверить доступность сервиса по URL.
-    Возвращает кортеж: (доступен: bool, код ответа: int).
-    """
-    headers = {"User-Agent": "Mozilla/5.0 (compatible; ServiceMonitor/1.0)"}
-    try:
-        request = urllib.request.Request(url, headers=headers)
-        response = urllib.request.urlopen(request, timeout=5)
-        code = response.getcode()
-        return True, code
-    except urllib.error.HTTPError as e:
-        return False, e.code
-    except urllib.error.URLError:
-        return False, 0
-    except Exception:
-        return False, 0
-
-
-def check_service_status(name, url):
-    """Проверить и вывести статус одного сервиса."""
-    available, code = ping_service(url)
-    if available:
-        status_text = "Доступен"
-    else:
-        status_text = "Недоступен"
-
-    print(f"  {name}")
-    print(f"    URL: {url}")
-    print(f"    Статус: {status_text} (код: {code})")
-    print()
-    return available
-
-
-def show_all_services():
-    """Вывести статус всех сервисов из папки services/."""
-    services_dir = os.path.join(os.path.dirname(__file__), "services")
+def show_all_services(services: list[dict]) -> None:
+    """Проверить и вывести статус всех сервисов."""
     print("\n=== Мониторинг сервисов ===\n")
-
-    count = 0
-    for filename in sorted(os.listdir(services_dir)):
-        if filename.endswith(".py") and not filename.startswith("__"):
-            module_name = filename[:-3]
-            module = importlib.import_module(f"services.{module_name}")
-            check_service_status(module.name, module.url)
-            count += 1
-
-    if count == 0:
+    if not services:
         print("  Список сервисов пуст.\n")
+        return
+
+    for service in services:
+        check_service_status(service)
 
 
-def list_services():
-    """Вывести список всех сервисов без проверки."""
-    services_dir = os.path.join(os.path.dirname(__file__), "services")
+def list_services(services: list[dict]) -> None:
+    """Вывести список сервисов по названию, без проверки."""
     print("\n=== Список сервисов ===\n")
-
-    count = 0
-    for filename in sorted(os.listdir(services_dir)):
-        if filename.endswith(".py") and not filename.startswith("__"):
-            module_name = filename[:-3]
-            module = importlib.import_module(f"services.{module_name}")
-            print(f"  {module.name}")
-            print(f"    URL: {module.url}")
-            print(f"    Описание: {module.description}")
-            print()
-            count += 1
-
-    if count == 0:
+    if not services:
         print("  Список сервисов пуст.\n")
+        return
+
+    for service in sort_services(services):
+        print(f"  {service['name']}")
+        print(f"    URL: {service['url']}")
+        print(f"    Описание: {service.get('description', '')}")
+        print()
 
 
-def add_service(name, url, description):
-    """Добавить новый сервис, создав файл в папке services/."""
-    safe_name = name.lower().replace(" ", "_")
-    services_dir = os.path.join(os.path.dirname(__file__), "services")
-    filepath = os.path.join(services_dir, f"{safe_name}.py")
-
-    if os.path.exists(filepath):
-        print(f"  Сервис '{name}' уже существует.")
-        return False
-
-    with open(filepath, "w", encoding="utf-8") as f:
-        f.write(f'name = "{name}"\n')
-        f.write(f'url = "{url}"\n')
-        f.write(f'description = "{description}"\n')
-
-    print(f"  Сервис '{name}' добавлен.")
-    return True
-
-
-def remove_service(name):
-    """Удалить сервис по названию."""
-    services_dir = os.path.join(os.path.dirname(__file__), "services")
-    safe_name = name.lower().replace(" ", "_")
-    filepath = os.path.join(services_dir, f"{safe_name}.py")
-
-    if not os.path.exists(filepath):
-        print(f"  Сервис '{name}' не найден.")
-        return False
-
-    os.remove(filepath)
-    print(f"  Сервис '{name}' удалён.")
-    return True
-
-
-def get_service_choice():
-    """Получить номер сервиса от пользователя."""
-    services_dir = os.path.join(os.path.dirname(__file__), "services")
-    files = sorted([
-        f for f in os.listdir(services_dir)
-        if f.endswith(".py") and not f.startswith("__")
-    ])
-
-    if not files:
+def choose_service(services: list[dict]) -> dict | None:
+    """Показать нумерованный список и вернуть выбранный сервис."""
+    if not services:
         print("  Список сервисов пуст.")
         return None
 
+    ordered = sort_services(services)
     print("\nДоступные сервисы:")
-    for i, filename in enumerate(files, 1):
-        module_name = filename[:-3]
-        module = importlib.import_module(f"services.{module_name}")
-        print(f"  {i}. {module.name}")
+    for index, service in enumerate(ordered, 1):
+        print(f"  {index}. {service['name']}")
 
-    try:
-        choice = int(input("\nВведите номер сервиса: "))
-        if 1 <= choice <= len(files):
-            return choice - 1
-        else:
-            print("  Неверный номер.")
-            return None
-    except ValueError:
-        print("  Введите число.")
-        return None
+    choice = input_int("\nВведите номер сервиса: ")
+    if 1 <= choice <= len(ordered):
+        return ordered[choice - 1]
 
-
-def get_filename_by_index(index):
-    """Получить имя модуля по индексу."""
-    services_dir = os.path.join(os.path.dirname(__file__), "services")
-    files = sorted([
-        f for f in os.listdir(services_dir)
-        if f.endswith(".py") and not f.startswith("__")
-    ])
-    if 0 <= index < len(files):
-        return files[index][:-3]
+    print("  Неверный номер.")
     return None
 
 
-def print_menu():
+def print_menu() -> None:
     """Вывести главное меню."""
     print("\n=== ServiceMonitor ===\n")
     print("1. Проверить все сервисы")
     print("2. Проверить сервис выборочно")
     print("3. Показать список сервисов")
-    print("4. Добавить сервис")
-    print("5. Удалить сервис")
-    print("6. Выход\n")
+    print("4. Найти сервис по названию")
+    print("5. Добавить сервис")
+    print("6. Удалить сервис")
+    print("7. Выход\n")
 
 
-def main():
+def main() -> None:
     """Точка запуска приложения."""
     print("\n=== ServiceMonitor ===")
-    print("Добро пожаловать! Загружаем сервисы...\n")
-
-    show_all_services()
+    services = load_services()
+    show_all_services(services)
 
     while True:
         print_menu()
-        choice = input("Выберите действие: ")
+        choice = input("Выберите действие: ").strip()
 
         if choice == "1":
-            show_all_services()
+            show_all_services(services)
 
         elif choice == "2":
-            index = get_service_choice()
-            if index is not None:
-                module_name = get_filename_by_index(index)
-                if module_name:
-                    module = importlib.import_module(f"services.{module_name}")
-                    print()
-                    check_service_status(module.name, module.url)
+            service = choose_service(services)
+            if service is not None:
+                print()
+                check_service_status(service)
 
         elif choice == "3":
-            list_services()
+            list_services(services)
 
         elif choice == "4":
-            print("\nДобавление нового сервиса:")
-            name = input("  Название: ").strip()
-            url = input("  URL для проверки: ").strip()
-            description = input("  Описание: ").strip()
-            if name and url:
-                add_service(name, url, description)
+            query = input_str("Введите часть названия: ")
+            found = search_services(services, query)
+            if found:
+                list_services(found)
             else:
-                print("  Название и URL обязательны.")
+                print("\n  Ничего не найдено.")
 
         elif choice == "5":
-            index = get_service_choice()
-            if index is not None:
-                module_name = get_filename_by_index(index)
-                if module_name:
-                    module = importlib.import_module(f"services.{module_name}")
-                    remove_service(module.name)
+            print("\nДобавление нового сервиса:")
+            name = input_str("  Название: ")
+            url = input_str("  URL для проверки: ")
+            description = input("  Описание: ").strip()
+            new_service = {
+                "name": name,
+                "url": url,
+                "description": description,
+            }
+            if save_service(new_service):
+                services.append(new_service)
+                print(f"  Сервис '{name}' добавлен.")
+            else:
+                print(f"  Сервис '{name}' уже существует.")
 
         elif choice == "6":
+            service = choose_service(services)
+            if service is not None:
+                if delete_service(service["name"]):
+                    services.remove(service)
+                    print(f"  Сервис '{service['name']}' удалён.")
+                else:
+                    print("  Не удалось удалить файл сервиса.")
+
+        elif choice == "7":
             print("\nДо свидания!")
             break
 

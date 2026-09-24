@@ -1,3 +1,0 @@
-name = "YouTube"
-url = "https://www.youtube.com"
-description = "Видеоплатформа Google"

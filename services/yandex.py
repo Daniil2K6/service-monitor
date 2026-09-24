@@ -1,3 +1,0 @@
-name = "Yandex"
-url = "https://yandex.com"
-description = "Поисковая система"

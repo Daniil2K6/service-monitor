@@ -1,3 +1,0 @@
-name = "Google"
-url = "https://www.google.com"
-description = "Поисковая система Google"
