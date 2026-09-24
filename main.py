@@ -1,26 +1,13 @@
 """Точка запуска ServiceMonitor: меню и вывод данных."""
 
-from checker import (
-    check_service_status,
-    search_services,
-    sort_services,
-)
+from checker import sort_services
+from monitor import Monitor
+from service import Service
 from storage import delete_service, load_services, save_service
 from utils import input_int, input_str
 
 
-def show_all_services(services: list[dict]) -> None:
-    """Проверить и вывести статус всех сервисов."""
-    print("\n=== Мониторинг сервисов ===\n")
-    if not services:
-        print("  Список сервисов пуст.\n")
-        return
-
-    for service in services:
-        check_service_status(service)
-
-
-def list_services(services: list[dict]) -> None:
+def list_services(services: list[Service]) -> None:
     """Вывести список сервисов по названию, без проверки."""
     print("\n=== Список сервисов ===\n")
     if not services:
@@ -28,13 +15,13 @@ def list_services(services: list[dict]) -> None:
         return
 
     for service in sort_services(services):
-        print(f"  {service['name']}")
-        print(f"    URL: {service['url']}")
-        print(f"    Описание: {service.get('description', '')}")
+        print(f"  {service.name}")
+        print(f"    URL: {service.url}")
+        print(f"    Описание: {service.description}")
         print()
 
 
-def choose_service(services: list[dict]) -> dict | None:
+def choose_service(services: list[Service]) -> Service | None:
     """Показать нумерованный список и вернуть выбранный сервис."""
     if not services:
         print("  Список сервисов пуст.")
@@ -43,7 +30,7 @@ def choose_service(services: list[dict]) -> dict | None:
     ordered = sort_services(services)
     print("\nДоступные сервисы:")
     for index, service in enumerate(ordered, 1):
-        print(f"  {index}. {service['name']}")
+        print(f"  {index}. {service.name}")
 
     choice = input_int("\nВведите номер сервиса: ")
     if 1 <= choice <= len(ordered):
@@ -68,28 +55,27 @@ def print_menu() -> None:
 def main() -> None:
     """Точка запуска приложения."""
     print("\n=== ServiceMonitor ===")
-    services = load_services()
-    show_all_services(services)
+    monitor = Monitor(load_services())
+    monitor.check_all()
 
     while True:
         print_menu()
         choice = input("Выберите действие: ").strip()
 
         if choice == "1":
-            show_all_services(services)
+            monitor.check_all()
 
         elif choice == "2":
-            service = choose_service(services)
+            service = choose_service(monitor.services)
             if service is not None:
-                print()
-                check_service_status(service)
+                monitor.check_one(service)
 
         elif choice == "3":
-            list_services(services)
+            list_services(monitor.services)
 
         elif choice == "4":
             query = input_str("Введите часть названия: ")
-            found = search_services(services, query)
+            found = monitor.find(query)
             if found:
                 list_services(found)
             else:
@@ -100,23 +86,19 @@ def main() -> None:
             name = input_str("  Название: ")
             url = input_str("  URL для проверки: ")
             description = input("  Описание: ").strip()
-            new_service = {
-                "name": name,
-                "url": url,
-                "description": description,
-            }
+            new_service = Service(name, url, description)
             if save_service(new_service):
-                services.append(new_service)
+                monitor.add(new_service)
                 print(f"  Сервис '{name}' добавлен.")
             else:
                 print(f"  Сервис '{name}' уже существует.")
 
         elif choice == "6":
-            service = choose_service(services)
+            service = choose_service(monitor.services)
             if service is not None:
-                if delete_service(service["name"]):
-                    services.remove(service)
-                    print(f"  Сервис '{service['name']}' удалён.")
+                if delete_service(service.name):
+                    monitor.remove(service)
+                    print(f"  Сервис '{service.name}' удалён.")
                 else:
                     print("  Не удалось удалить файл сервиса.")
 
