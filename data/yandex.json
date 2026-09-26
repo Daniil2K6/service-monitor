@@ -1,5 +1,6 @@
 {
   "name": "Yandex",
   "url": "https://yandex.com",
-  "description": "Поисковая система"
+  "description": "Поисковая система",
+  "group": "Поисковые системы"
 }

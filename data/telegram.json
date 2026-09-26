@@ -1,5 +1,6 @@
 {
   "name": "Telegram",
   "url": "https://telegram.org",
-  "description": "Мессенджер"
+  "description": "Мессенджер",
+  "group": "Соцсети и мессенджеры"
 }

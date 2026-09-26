@@ -1,5 +1,6 @@
 {
   "name": "Discord",
   "url": "https://discord.com",
-  "description": "Платформа для общения"
+  "description": "Платформа для общения",
+  "group": "Соцсети и мессенджеры"
 }

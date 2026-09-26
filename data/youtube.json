@@ -1,5 +1,6 @@
 {
   "name": "YouTube",
   "url": "https://www.youtube.com",
-  "description": "Видеоплатформа Google"
+  "description": "Видеоплатформа Google",
+  "group": "Видео и игры"
 }
