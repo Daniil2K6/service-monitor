@@ -22,3 +22,4 @@ Thumbs.db
 
 # Docs ( assignments reference)
 docs/
+db.sqlite3
