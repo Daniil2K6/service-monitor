@@ -20,6 +20,12 @@
         >
             Проверить все сервисы
         </a>
+        <a
+            href="{% url 'services:search' %}"
+            class="btn btn-outline-primary"
+        >
+            Найти сервис
+        </a>
     </div>
 
     {% for service in services %}

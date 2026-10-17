@@ -1,0 +1,79 @@
+{% extends "base.html" %}
+
+{% block title %}
+    История проверок – ServiceMonitor
+{% endblock %}
+
+{% block content %}
+    <h1>История проверок</h1>
+
+    <p>
+        Всего проверок: {{ total }},
+        доступных: {{ available_count }}.
+    </p>
+
+    <div class="mb-3 d-flex gap-2 flex-wrap">
+        <a
+            href="{% url 'services:checks' %}"
+            class="btn btn-outline-secondary{% if not available %} active{% endif %}"
+        >
+            Все
+        </a>
+        <a
+            href="{% url 'services:checks' %}?available=1"
+            class="btn btn-outline-success{% if available == '1' %} active{% endif %}"
+        >
+            Доступные
+        </a>
+        <a
+            href="{% url 'services:checks' %}?available=0"
+            class="btn btn-outline-danger{% if available == '0' %} active{% endif %}"
+        >
+            Недоступные
+        </a>
+    </div>
+
+    <table class="table table-striped">
+        <thead>
+            <tr>
+                <th>Дата проверки</th>
+                <th>Сервис</th>
+                <th>Группа</th>
+                <th>Статус</th>
+                <th>Код</th>
+            </tr>
+        </thead>
+        <tbody>
+            {% for check in checks %}
+                <tr>
+                    <td>{{ check.checked_at }}</td>
+                    <td>{{ check.service_name }}</td>
+                    <td>{{ check.group_name|default:"—" }}</td>
+                    <td>
+                        {% if check.available %}
+                            <span class="badge bg-success">
+                                Доступен
+                            </span>
+                        {% else %}
+                            <span class="badge bg-danger">
+                                Недоступен
+                            </span>
+                        {% endif %}
+                    </td>
+                    <td>{{ check.code }}</td>
+                </tr>
+            {% empty %}
+                <tr>
+                    <td colspan="5">Проверок по условию не найдено.</td>
+                </tr>
+            {% endfor %}
+        </tbody>
+    </table>
+
+    <a
+        href="{% url 'services:list' %}"
+        class="btn btn-outline-secondary mt-3"
+    >
+        ← к списку сервисов
+    </a>
+{% endblock %}

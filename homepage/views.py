@@ -3,16 +3,27 @@
 from django.http import HttpRequest, HttpResponse
 from django.shortcuts import render
 
-from storage import load_groups, load_services
+from db.database import get_connection
 
 
 def index(request: HttpRequest) -> HttpResponse:
-    """Главная страница: описание и ссылки на разделы."""
-    groups = load_groups()
-    services = load_services(groups)
+    """Главная страница: счётчики из базы данных и ссылки."""
+    conn = get_connection()
+    try:
+        row = conn.execute(
+            """
+            SELECT
+                (SELECT COUNT(*) FROM services) AS services_count,
+                (SELECT COUNT(*) FROM groups) AS groups_count,
+                (SELECT COUNT(*) FROM checks) AS checks_count;
+            """
+        ).fetchone()
+    finally:
+        conn.close()
     context = {
-        "services_count": len(services),
-        "groups_count": len(groups),
+        "services_count": row["services_count"],
+        "groups_count": row["groups_count"],
+        "checks_count": row["checks_count"],
     }
     return render(request, "homepage/index.html", context)
 

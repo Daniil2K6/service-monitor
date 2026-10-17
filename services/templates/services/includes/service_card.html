@@ -8,7 +8,14 @@
                 <span class="upd-toast">обновлено</span>
             </h2>
             <p class="card-text mb-0">
-                Группа: {{ service.group.name|default:"—" }}
+                Группа:
+                {% if service.group_name %}
+                    <a href="{% url 'groups:detail' service.group_slug %}">
+                        {{ service.group_name }}
+                    </a>
+                {% else %}
+                    —
+                {% endif %}
             </p>
         </div>
 

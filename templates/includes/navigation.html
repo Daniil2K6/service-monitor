@@ -1,5 +1,12 @@
 <nav class="nav container">
     <a class="nav-link" href="{% url 'homepage:index' %}">Главная</a>
     <a class="nav-link" href="{% url 'services:list' %}">Сервисы</a>
+    <a class="nav-link" href="{% url 'services:search' %}">Поиск</a>
+    <a class="nav-link" href="{% url 'services:checks' %}">
+        История проверок
+    </a>
+    <a class="nav-link" href="{% url 'services:statistics' %}">
+        Статистика
+    </a>
     <a class="nav-link" href="{% url 'groups:list' %}">Группы</a>
 </nav>

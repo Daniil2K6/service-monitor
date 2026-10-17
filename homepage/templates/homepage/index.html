@@ -13,11 +13,26 @@
 
     <p>
         Сервисов: {{ services_count }},
-        групп: {{ groups_count }}.
+        групп: {{ groups_count }},
+        проверок: {{ checks_count }}.
+    </p>
+
+    <p>
+        Данные страниц получаются из базы данных SQLite
+        запросами SQL.
     </p>
 
     <a href="{% url 'services:list' %}" class="btn btn-primary me-2">
         Сервисы
+    </a>
+    <a href="{% url 'services:search' %}" class="btn btn-primary me-2">
+        Поиск
+    </a>
+    <a
+        href="{% url 'services:statistics' %}"
+        class="btn btn-primary me-2"
+    >
+        Статистика
     </a>
     <a href="{% url 'groups:list' %}" class="btn btn-secondary">
         Группы

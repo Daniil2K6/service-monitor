@@ -8,6 +8,13 @@ app_name = "services"
 
 urlpatterns = [
     path("", views.services, name="list"),
+    path("search/", views.service_search, name="search"),
+    path(
+        "statistics/",
+        views.service_statistics,
+        name="statistics",
+    ),
+    path("checks/", views.service_checks, name="checks"),
     path("check/", views.check_all, name="check_all"),
     path("new/", views.service_create, name="create"),
     path(

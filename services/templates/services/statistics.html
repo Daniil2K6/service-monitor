@@ -1,0 +1,110 @@
+{% extends "base.html" %}
+
+{% block title %}
+    Статистика – ServiceMonitor
+{% endblock %}
+
+{% block content %}
+    <h1>Статистика проверок</h1>
+
+    <p>
+        Данные получены из базы SQLite агрегатными запросами
+        с группировкой (GROUP BY) и фильтрацией групп (HAVING).
+    </p>
+
+    <h2 class="h4 mt-4">Проверки по сервисам (GROUP BY)</h2>
+    <table class="table table-striped">
+        <thead>
+            <tr>
+                <th>Сервис</th>
+                <th>Всего проверок</th>
+                <th>Доступных</th>
+                <th>Доступность</th>
+            </tr>
+        </thead>
+        <tbody>
+            {% for item in statistics %}
+                <tr>
+                    <td>{{ item.service_name }}</td>
+                    <td>{{ item.checks_count }}</td>
+                    <td>{{ item.available_count }}</td>
+                    <td>{{ item.percent }}%</td>
+                </tr>
+            {% empty %}
+                <tr>
+                    <td colspan="4">Данные отсутствуют.</td>
+                </tr>
+            {% endfor %}
+        </tbody>
+    </table>
+
+    <h2 class="h4 mt-4">
+        Сервисы с числом проверок больше 2 (HAVING)
+    </h2>
+    <table class="table table-striped">
+        <thead>
+            <tr>
+                <th>Сервис</th>
+                <th>Проверок</th>
+            </tr>
+        </thead>
+        <tbody>
+            {% for item in top_services %}
+                <tr>
+                    <td>{{ item.service_name }}</td>
+                    <td>{{ item.checks_count }}</td>
+                </tr>
+            {% empty %}
+                <tr>
+                    <td colspan="2">
+                        Нет сервисов с таким числом проверок.
+                    </td>
+                </tr>
+            {% endfor %}
+        </tbody>
+    </table>
+
+    <h2 class="h4 mt-4">
+        Сервисы без проверок (LEFT JOIN, IS NULL)
+    </h2>
+    <ul class="list-group mb-3">
+        {% for item in without_checks %}
+            <li class="list-group-item">
+                {{ item.service_name }} — {{ item.url }}
+            </li>
+        {% empty %}
+            <li class="list-group-item">
+                Все сервисы имеют хотя бы одну проверку.
+            </li>
+        {% endfor %}
+    </ul>
+
+    <h2 class="h4 mt-4">Сервисы по группам (GROUP BY)</h2>
+    <table class="table table-striped">
+        <thead>
+            <tr>
+                <th>Группа</th>
+                <th>Сервисов</th>
+            </tr>
+        </thead>
+        <tbody>
+            {% for item in by_group %}
+                <tr>
+                    <td>{{ item.group_name }}</td>
+                    <td>{{ item.services_count }}</td>
+                </tr>
+            {% empty %}
+                <tr>
+                    <td colspan="2">Данные отсутствуют.</td>
+                </tr>
+            {% endfor %}
+        </tbody>
+    </table>
+
+    <a
+        href="{% url 'services:list' %}"
+        class="btn btn-outline-secondary mt-3"
+    >
+        ← к списку сервисов
+    </a>
+{% endblock %}

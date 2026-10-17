@@ -1,0 +1,67 @@
+{% extends "base.html" %}
+
+{% block title %}
+    Поиск сервисов – ServiceMonitor
+{% endblock %}
+
+{% block content %}
+    <h1>Поиск сервисов</h1>
+
+    <p>
+        Укажите часть названия сервиса или выберите группу.
+        Запрос к базе данных выполняется с параметром.
+    </p>
+
+    <form method="get" class="row g-2 mb-4">
+        <div class="col-md-6">
+            <label class="form-label" for="q">Название</label>
+            <input
+                class="form-control"
+                type="text"
+                id="q"
+                name="q"
+                value="{{ query }}"
+            >
+        </div>
+
+        <div class="col-md-4">
+            <label class="form-label" for="group">Группа</label>
+            <select class="form-select" id="group" name="group">
+                <option value="">Все группы</option>
+                {% for group in groups %}
+                    <option
+                        value="{{ group.id }}"
+                        {% if group.id|stringformat:"s" == group_id %}
+                            selected
+                        {% endif %}
+                    >
+                        {{ group.name }}
+                    </option>
+                {% endfor %}
+            </select>
+        </div>
+
+        <div class="col-md-2 d-flex align-items-end">
+            <button class="btn btn-primary w-100" type="submit">
+                Найти
+            </button>
+        </div>
+    </form>
+
+    {% if query or group_id %}
+        <p>Найдено сервисов: {{ services|length }}</p>
+
+        {% for service in services %}
+            {% include "services/includes/service_card.html" %}
+        {% empty %}
+            <p>По заданным условиям сервисы не найдены.</p>
+        {% endfor %}
+    {% endif %}
+
+    <a
+        href="{% url 'services:list' %}"
+        class="btn btn-outline-secondary mt-3"
+    >
+        ← к списку сервисов
+    </a>
+{% endblock %}

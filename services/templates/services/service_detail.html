@@ -21,9 +21,9 @@
 
                 <p class="card-text">
                     <strong>Группа:</strong>
-                    {% if service.group %}
-                        <a href="{% url 'groups:detail' service.group.slug %}">
-                            {{ service.group.name }}
+                    {% if service.group_name %}
+                        <a href="{% url 'groups:detail' service.group_slug %}">
+                            {{ service.group_name }}
                         </a>
                     {% else %}
                         —
@@ -42,23 +42,35 @@
 
                 <p class="card-text">
                     <strong>Код ответа:</strong>
-                    {{ code|default_if_none:"—" }}
+                    {{ service.last_code|default_if_none:"—" }}
                 </p>
 
                 <p class="card-text">
                     <strong>Последняя проверка:</strong>
-                    {{ moment|default_if_none:"—" }}
+                    {{ service.last_checked_at|default_if_none:"—" }}
                 </p>
 
                 <p class="card-text">
                     <strong>Проверок:</strong>
-                    {{ service.checks|length }}
+                    {{ service.checks_count }}
                 </p>
 
                 <h2 class="h6">История проверок</h2>
                 <ul class="list-group">
-                    {% for result in service.checks %}
-                        <li class="list-group-item">{{ result }}</li>
+                    {% for result in checks %}
+                        <li class="list-group-item">
+                            {% if result.available %}
+                                <span class="badge bg-success">
+                                    Доступен
+                                </span>
+                            {% else %}
+                                <span class="badge bg-danger">
+                                    Недоступен
+                                </span>
+                            {% endif %}
+                            {{ result.checked_at }}
+                            (код: {{ result.code }})
+                        </li>
                     {% empty %}
                         <li class="list-group-item">
                             Проверок пока нет.
