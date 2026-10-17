@@ -17,6 +17,11 @@ class Group:
         self.description = description
         self.services: list[Service] = []
 
+    @property
+    def slug(self) -> str:
+        """Идентификатор группы для URL."""
+        return self.name.lower().replace(" ", "_")
+
     def add_service(self, service: Service) -> None:
         """Добавить сервис в группу (связь группа -> сервис)."""
         if service not in self.services:

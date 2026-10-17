@@ -31,6 +31,11 @@ class Service:
         """Доступен ли сервис после последней проверки."""
         return self._available
 
+    @property
+    def slug(self) -> str:
+        """Идентификатор сервиса для URL (как имя JSON-файла)."""
+        return self.name.lower().replace(" ", "_")
+
     def record_result(
         self, available: bool, code: int
     ) -> CheckResult:
@@ -69,6 +74,26 @@ class Service:
         """Вернуть текстовый статус сервиса."""
         if self._available:
             return "Доступен"
+        return "Недоступен"
+
+    @property
+    def status_class(self) -> str:
+        """CSS-класс бейджа по последней проверке."""
+        last = self.last_check()
+        if last is None:
+            return "bg-secondary"
+        return "bg-success" if last.available else "bg-danger"
+
+    @property
+    def status_label(self) -> str:
+        """Текст статуса по последней проверке."""
+        last = self.last_check()
+        if last is None:
+            return "не проверялся"
+        if last.available:
+            return "Доступен"
+        if last.code == 0:
+            return "нет ответа (таймаут)"
         return "Недоступен"
 
     def to_dict(self) -> dict:

@@ -1,0 +1,111 @@
+{% extends "base.html" %}
+
+{% block title %}
+    {% if service %}
+        {{ service.name }} – ServiceMonitor
+    {% else %}
+        Сервис не найден – ServiceMonitor
+    {% endif %}
+{% endblock %}
+
+{% block content %}
+    {% if service %}
+        <div class="card service-card">
+            <div class="card-body">
+                <h1 class="card-title h3">{{ service.name }}</h1>
+
+                <p class="card-text">
+                    <strong>URL:</strong>
+                    <a href="{{ service.url }}">{{ service.url }}</a>
+                </p>
+
+                <p class="card-text">
+                    <strong>Группа:</strong>
+                    {% if service.group %}
+                        <a href="{% url 'groups:detail' service.group.slug %}">
+                            {{ service.group.name }}
+                        </a>
+                    {% else %}
+                        —
+                    {% endif %}
+                </p>
+
+                <p class="card-text">
+                    <strong>Описание:</strong>
+                    {{ service.description|default:"—" }}
+                </p>
+
+                <p class="card-text">
+                    <strong>Статус:</strong>
+                    {% include "services/includes/service_status.html" %}
+                </p>
+
+                <p class="card-text">
+                    <strong>Код ответа:</strong>
+                    {{ code|default_if_none:"—" }}
+                </p>
+
+                <p class="card-text">
+                    <strong>Последняя проверка:</strong>
+                    {{ moment|default_if_none:"—" }}
+                </p>
+
+                <p class="card-text">
+                    <strong>Проверок:</strong>
+                    {{ service.checks|length }}
+                </p>
+
+                <h2 class="h6">История проверок</h2>
+                <ul class="list-group">
+                    {% for result in service.checks %}
+                        <li class="list-group-item">{{ result }}</li>
+                    {% empty %}
+                        <li class="list-group-item">
+                            Проверок пока нет.
+                        </li>
+                    {% endfor %}
+                </ul>
+
+                <div class="mt-3 d-flex gap-2 flex-wrap">
+                    <a
+                        href="{% url 'services:check' service.slug %}?next=detail"
+                        class="btn btn-success"
+                    >
+                        Проверить
+                    </a>
+                    <a
+                        href="{% url 'services:edit' service.slug %}"
+                        class="btn btn-primary"
+                    >
+                        Изменить
+                    </a>
+                    <a
+                        href="{% url 'services:delete' service.slug %}"
+                        class="btn btn-outline-danger"
+                    >
+                        Удалить
+                    </a>
+                    <a
+                        href="{% url 'services:list' %}"
+                        class="btn btn-outline-secondary"
+                    >
+                        ← к списку
+                    </a>
+                </div>
+            </div>
+        </div>
+    {% else %}
+        <h1 class="text-danger">Сервис не найден</h1>
+
+        <p>
+            Сервис с указанным идентификатором отсутствует.
+        </p>
+
+        <a
+            href="{% url 'services:list' %}"
+            class="btn btn-outline-secondary mt-3"
+        >
+            ← к списку сервисов
+        </a>
+    {% endif %}
+{% endblock %}

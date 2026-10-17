@@ -1,0 +1,57 @@
+body {
+    min-height: 100vh;
+    background-color: #f8f9fa;
+}
+
+.app-logo {
+    width: 220px;
+    height: auto;
+    margin: 1rem 0 0.5rem;
+}
+
+/* Карточка сервиса (ПР6): собственное оформление проекта */
+.service-card {
+    margin-bottom: 1rem;
+    padding: 0.25rem;
+    border: 1px solid #dee2e6;
+    border-left: 4px solid #0d6efd;
+    border-radius: 8px;
+    background-color: #ffffff;
+}
+
+.group-card {
+    border: 1px solid #dee2e6;
+    border-radius: 8px;
+    background-color: #ffffff;
+}
+
+/* Статус проверки сервиса */
+.service-status {
+    font-weight: 600;
+    letter-spacing: 0.02em;
+}
+
+.service-status-up {
+    color: #0f5132;
+}
+
+.service-status-down {
+    color: #842029;
+}
+
+/* Метка «обновлено» для проверки в реальном времени */
+.upd-toast {
+    display: inline-block;
+    margin-left: 8px;
+    padding: 2px 8px;
+    border-radius: 4px;
+    background: #198754;
+    color: #fff;
+    font-size: 12px;
+    opacity: 0;
+    transition: opacity 0.3s;
+}
+
+.upd-toast.show {
+    opacity: 1;
+}

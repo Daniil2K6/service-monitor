@@ -1,0 +1,13 @@
+{% if not service.last_check %}
+    <span class="badge bg-secondary service-status">
+        не проверялся
+    </span>
+{% elif service.available %}
+    <span class="badge bg-success service-status service-status-up">
+        Доступен
+    </span>
+{% else %}
+    <span class="badge bg-danger service-status service-status-down">
+        Недоступен
+    </span>
+{% endif %}

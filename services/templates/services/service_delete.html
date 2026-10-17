@@ -1,0 +1,33 @@
+{% extends "base.html" %}
+
+{% block title %}
+    Удаление сервиса – ServiceMonitor
+{% endblock %}
+
+{% block content %}
+    <div class="card service-card">
+        <div class="card-body">
+            <h1 class="card-title h5">Удалить сервис?</h1>
+
+            <p class="card-text">
+                {{ service.name }} — {{ service.url }}
+            </p>
+
+            <form
+                method="post"
+                action="{% url 'services:delete' service.slug %}"
+            >
+                {% csrf_token %}
+                <button class="btn btn-danger" type="submit">
+                    Удалить
+                </button>
+                <a
+                    class="btn btn-outline-secondary"
+                    href="{% url 'services:detail' service.slug %}"
+                >
+                    Отмена
+                </a>
+            </form>
+        </div>
+    </div>
+{% endblock %}

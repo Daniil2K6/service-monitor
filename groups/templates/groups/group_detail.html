@@ -1,0 +1,58 @@
+{% extends "base.html" %}
+
+{% block title %}
+    {% if group %}
+        {{ group.name }} – ServiceMonitor
+    {% else %}
+        Группа не найдена – ServiceMonitor
+    {% endif %}
+{% endblock %}
+
+{% block content %}
+    {% if group %}
+        <div class="card service-card">
+            <div class="card-body">
+                <h1 class="card-title h3">{{ group.name }}</h1>
+
+                <p class="card-text">
+                    <strong>Описание:</strong>
+                    {{ group.description|default:"—" }}
+                </p>
+
+                <p class="card-text">
+                    <strong>Сервисов:</strong>
+                    {{ group.services|length }}
+                </p>
+
+                <p class="card-text">
+                    <strong>Проверок:</strong> {{ total_results }},
+                    доступно: {{ available }} ({{ percent }}%)
+                </p>
+
+                <h2 class="h6">Сервисы группы</h2>
+
+                {% for service in services %}
+                    {% include "services/includes/service_card.html" %}
+                {% empty %}
+                    <p>В группе нет сервисов.</p>
+                {% endfor %}
+
+                <a
+                    href="{% url 'groups:list' %}"
+                    class="btn btn-outline-secondary mt-3"
+                >
+                    ← к списку групп
+                </a>
+            </div>
+        </div>
+    {% else %}
+        <h1 class="text-danger">Группа не найдена</h1>
+
+        <a
+            href="{% url 'groups:list' %}"
+            class="btn btn-outline-secondary mt-3"
+        >
+            ← к списку групп
+        </a>
+    {% endif %}
+{% endblock %}

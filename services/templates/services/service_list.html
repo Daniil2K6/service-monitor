@@ -1,0 +1,37 @@
+{% extends "base.html" %}
+
+{% block title %}
+    Сервисы – ServiceMonitor
+{% endblock %}
+
+{% block content %}
+    <h1>Сервисы</h1>
+
+    <p>Всего сервисов: {{ services|length }}</p>
+
+    <div class="mb-3 d-flex gap-2 flex-wrap">
+        <a href="{% url 'services:create' %}" class="btn btn-success">
+            Добавить сервис
+        </a>
+        <a
+            href="{% url 'services:check_all' %}"
+            id="check-all"
+            class="btn btn-warning"
+        >
+            Проверить все сервисы
+        </a>
+    </div>
+
+    {% for service in services %}
+        {% include "services/includes/service_card.html" %}
+    {% empty %}
+        <p>Сервисы не найдены.</p>
+    {% endfor %}
+
+    <a
+        href="{% url 'homepage:index' %}"
+        class="btn btn-outline-secondary mt-3"
+    >
+        ← на главную
+    </a>
+{% endblock %}

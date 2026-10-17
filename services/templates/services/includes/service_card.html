@@ -1,0 +1,38 @@
+<article class="card service-card mb-3" data-slug="{{ service.slug }}">
+    <div class="card-body d-flex justify-content-between align-items-center flex-wrap gap-2">
+        <div>
+            <h2 class="card-title h5 mb-1">
+                <a href="{% url 'services:detail' service.slug %}">
+                    {{ service.name|default:"Без названия" }}
+                </a>
+                <span class="upd-toast">обновлено</span>
+            </h2>
+            <p class="card-text mb-0">
+                Группа: {{ service.group.name|default:"—" }}
+            </p>
+        </div>
+
+        <div class="d-flex align-items-center gap-2">
+            {% include "services/includes/service_status.html" %}
+
+            <a
+                href="{% url 'services:check' service.slug %}"
+                class="btn btn-sm btn-outline-success js-check"
+            >
+                Проверить
+            </a>
+            <a
+                href="{% url 'services:edit' service.slug %}"
+                class="btn btn-sm btn-outline-primary"
+            >
+                Изменить
+            </a>
+            <a
+                href="{% url 'services:delete' service.slug %}"
+                class="btn btn-sm btn-outline-danger"
+            >
+                Удалить
+            </a>
+        </div>
+    </div>
+</article>
