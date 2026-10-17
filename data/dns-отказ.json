@@ -1,0 +1,6 @@
+{
+  "name": "DNS-отказ",
+  "url": "https://no-such-service.invalid",
+  "description": "Домен .invalid зарезервирован IANA: DNS отвечает мгновенно — тест мгновенного отказа",
+  "group": "Тестовые сервисы"
+}

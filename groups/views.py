@@ -10,7 +10,7 @@ from checker import (
     percent_available,
     service_slug,
 )
-from homepage.views import page
+from homepage.views import html_response
 from monitor import Monitor
 from services.views import restore_checks, status_badge
 from storage import load_groups, load_services
@@ -40,7 +40,7 @@ def groups(request: HttpRequest) -> HttpResponse:
         ← на главную
     </a>
     """
-    return HttpResponse(page("ServiceMonitor – группы", content))
+    return html_response("ServiceMonitor — группы", content)
 
 
 def group_detail(
@@ -59,9 +59,8 @@ def group_detail(
             ← к списку групп
         </a>
         """
-        return HttpResponse(
-            page("Группа не найдена", content),
-            status=404,
+        return html_response(
+            "Группа не найдена", content, status=404
         )
 
     items = ""
@@ -104,4 +103,4 @@ def group_detail(
         </div>
     </div>
     """
-    return HttpResponse(page(group.name, content))
+    return html_response(group.name, content)

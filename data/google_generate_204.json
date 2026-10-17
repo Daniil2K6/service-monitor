@@ -1,0 +1,6 @@
+{
+  "name": "Google generate_204",
+  "url": "https://google.com/generate_204",
+  "description": "Специальный эндпоинт Google для проверки соединения: отвечает 204 без содержимого",
+  "group": "Тестовые сервисы"
+}

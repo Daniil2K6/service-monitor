@@ -9,3 +9,5 @@ urlpatterns = [
     path("services/", include("services.urls")),
     path("groups/", include("groups.urls")),
 ]
+
+handler404 = "homepage.views.page_not_found"

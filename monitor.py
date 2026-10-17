@@ -1,5 +1,7 @@
 """Класс Monitor: система мониторинга и связи между сущностями."""
 
+from concurrent.futures import ThreadPoolExecutor, as_completed
+
 from group import Group
 from service import Service
 
@@ -52,15 +54,29 @@ class Monitor:
             service.group.remove_service(service)
 
     def check_all(self) -> None:
-        """Проверить все сервисы, записывая CheckResult."""
+        """Проверить все сервисы одновременно.
+
+        Запросы уходят всем адресам параллельно: даже если
+        часть сервисов отвечает до таймаута 10 секунд,
+        общее время проверки равно времени самого медленного
+        адреса. Результаты печатаются по мере поступления
+        ответов — не дожидаясь завершения всех проверок.
+        """
         print("\n=== Мониторинг сервисов ===\n")
         if not self.services:
             print("  Список сервисов пуст.\n")
             return
-        for service in self.services:
-            service.check()
-            print(service)
-            print()
+        with ThreadPoolExecutor(
+            max_workers=max(len(self.services), 1)
+        ) as pool:
+            futures = {
+                pool.submit(service.check): service
+                for service in self.services
+            }
+            for future in as_completed(futures):
+                future.result()
+                print(futures[future])
+                print()
 
     def check_one(self, service: Service) -> None:
         """Проверить один сервис и вывести результат."""

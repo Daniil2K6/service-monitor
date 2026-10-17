@@ -48,14 +48,20 @@ class Service:
         return None
 
     def check(self) -> CheckResult:
-        """Проверить сервис и записать результат в историю."""
+        """Проверить сервис и записать результат в историю.
+
+        Если сервис не отвечает 10 секунд, засчитывается
+        ошибка: доступность False, код ответа 0.
+        """
         headers = {"User-Agent": "ServiceMonitor/1.0"}
         try:
             request = urllib.request.Request(self.url, headers=headers)
-            response = urllib.request.urlopen(request, timeout=5)
+            response = urllib.request.urlopen(request, timeout=10)
             return self.record_result(True, response.getcode())
         except urllib.error.HTTPError as exc:
             return self.record_result(False, exc.code)
+        except TimeoutError:
+            return self.record_result(False, 0)
         except Exception:
             return self.record_result(False, 0)
 

@@ -1,0 +1,6 @@
+{
+  "name": "HTTP 503",
+  "url": "https://httpbin.org/status/503",
+  "description": "httpbin.org сразу отвечает 503 — недоступность с ответом, а не таймаут",
+  "group": "Тестовые сервисы"
+}

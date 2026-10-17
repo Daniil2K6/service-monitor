@@ -1,0 +1,6 @@
+{
+  "name": "Медленный ответ",
+  "url": "https://httpbin.org/delay/5",
+  "description": "httpbin.org/delay/5 отвечает через 5 секунд — медленный, но успешный ответ",
+  "group": "Тестовые сервисы"
+}
